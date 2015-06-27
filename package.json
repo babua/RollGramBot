@@ -1,0 +1,10 @@
+{
+	"name" : "node-telegram-dice-bot",
+	"version" : "0.0.1",
+	"description" : "A dice bot for Telegram aimed at RPGs",
+	"main" : "index.js",
+	"dependencies" : {
+		"node-telegram-bot" : "latest",
+		"mongoose" : "latest"
+	}
+}
