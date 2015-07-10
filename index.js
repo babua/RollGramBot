@@ -291,6 +291,7 @@ var bot = new Bot({
 			}
 			else if(splitStr[0] === "/roll")
 			{	
+				console.log('rolling n times');
 				var nTimes = parseInt(splitStr[0]);
 				if( nTimes > 0)
 				{
