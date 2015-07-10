@@ -71,6 +71,32 @@ var calculateRoll = function(roll){
 	return sum;
 }
 
+var calculateWodRoll = function(times,difficulty){
+
+	var success = 0;
+	var failure = 0;
+	for (var i = 0; i < times; i++) 
+	{
+		var rollResult =  (Math.floor(Math.random() * 10) + 1);
+		if(rollResult === 1)
+		{
+			failure++;
+		}
+		else if( rollResult >= difficulty ) 
+		{
+			success++;
+			if(rollResult === 10)
+			{
+				times++;
+			}
+		}
+	};
+	var result = {};
+	result.success = success;
+	result.failure = failure;
+	return result;
+}
+
 var bot = new Bot({
 	token: config.token
 })
@@ -180,7 +206,8 @@ var bot = new Bot({
 					if(user === null)
 					{
 						bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
-					} else 
+					} 
+					else 
 					{
 						//found user, now find roll if exists
 						var rollCallback = function(err,roll){
@@ -207,11 +234,11 @@ var bot = new Bot({
 						rollCallback.message = message;
 						rollCallback.key = key;
 						Roll.findOne({"id": message.from.id , "name" : key},rollCallback);
-				}
-			};
-			userCallback.message = message;
-			userCallback.key = key;
-			User.findOne({"id": message.from.id}, userCallback);
+					}
+				};
+				userCallback.message = message;
+				userCallback.key = key;
+				User.findOne({"id": message.from.id}, userCallback);
 			} 
 			else if(splitStr[0] === "/qroll")
 			{
@@ -222,6 +249,51 @@ var bot = new Bot({
 				}
 				var result = calculateRoll(roll);
 				bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : message.from.username + " | " + splitStr[1] + " | " + result },function(nodifiedPromise){});
+			}
+			else if(splitStr[0] === "/wod")
+			{
+				var key = splitStr[1];
+				var userCallback = function(err,user){
+					if(err) 
+					{
+						console.log(err);
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
+						return
+					}
+					if(user === null)
+					{
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
+					} 
+					else 
+					{
+						//found user, now find roll if exists
+						var rollCallback = function(err,wodroll){
+							if(err) 
+							{
+								console.log(err);
+								bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
+								return
+							}
+							if(wodroll === null)
+							{
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "Unsaved custom roll. Please save first with \"/wodsave <roll name> <dice amount> <difficulty>\", for example: \"/save attack 6 5\""},function(nodifiedPromise){});
+							} else 
+							{
+								result = calculateWodRoll(wodroll.times,wodroll.difficulty);
+								var msgText = message.from.username + " | " + key + " | " + result.success-result.failure + '\n';
+								msgText += 'Raw results | Success: ' + result.success + ' | Dramatic Failure: ' + result.failure;
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" :msgText },function(nodifiedPromise){});
+							}
+
+						}
+						rollCallback.message = message;
+						rollCallback.key = key;
+						WodRoll.findOne({"id": message.from.id , "name" : key},rollCallback);
+					}
+				};
+				userCallback.message = message;
+				userCallback.key = key;
+				User.findOne({"id": message.from.id}, userCallback);
 			}
 			// else
 			// {
