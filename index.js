@@ -292,7 +292,7 @@ var bot = new Bot({
 			{	
 				console.log('rolling n times');
 				var key = splitStr[1];
-				var nTimes = parseInt(splitStr[3]);
+				var nTimes = parseInt(splitStr[2]);
 				if( nTimes > 0)
 				{
 					console.log('rolling ' + key + ' ' + nTimes);
@@ -353,7 +353,7 @@ var bot = new Bot({
 				}
 				else
 				{
-					var msgText = "Invalid command for repeating saved roll. Try \"/roll <rollname> <integer>\" with <integer> smaller than 100. For example: \"/roll magicmissile 5\"";
+					var msgText = "Invalid command for repeating saved roll. Try \"/roll <rollname> <integer>\" with <integer> smaller than 100 and a previously saved roll name. For example: \"/roll magicmissile 5\"";
 					bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText},function(nodifiedPromise){});
 				}
 
