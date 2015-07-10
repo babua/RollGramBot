@@ -471,7 +471,7 @@ var bot = new Bot({
 
 				if(times > 0 && times <= 100 && difficulty > 0 && difficulty <= 10)
 				{
-					result = calculateWodRoll(wodroll.times,wodroll.difficulty);
+					result = calculateWodRoll(times,difficulty);
 					console.log(result);
 					var msgText = message.from.username + " | " + key + " | " + (result.success-result.failure) + '\n';
 					console.log(msgText);
