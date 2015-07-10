@@ -473,7 +473,7 @@ var bot = new Bot({
 				{
 					result = calculateWodRoll(times,difficulty);
 					console.log(result);
-					var msgText = message.from.username + " | " + key + " | " + (result.success-result.failure) + '\n';
+					var msgText = message.from.username + " | " + times + " dice at difficulty " + difficulty + " | " + (result.success-result.failure) + '\n';
 					console.log(msgText);
 					msgText += 'Success: ' + result.success + ' | Dramatic Failure: ' + result.failure;
 					bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" :msgText },function(nodifiedPromise){});
