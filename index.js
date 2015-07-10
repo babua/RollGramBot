@@ -120,7 +120,6 @@ var bot = new Bot({
 			}
 			else if (splitStr[0] === "/show")
 			{
-				console.log("showing rolls");
 				var userCallback = function(err,user)
 				{
 					if(err) 
@@ -134,7 +133,6 @@ var bot = new Bot({
 						bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
 					} else 
 					{
-						console.log('found user');
 					//found user, now display rolls
 						var rollCallback = function(err,rolls)
 						{
@@ -167,7 +165,6 @@ var bot = new Bot({
 				userCallback.message = message;
 				User.findOne({"id": message.from.id}, userCallback);
 			}
-
 		}
 		else if (splitStr.length === 2)
 		{ 
@@ -211,16 +208,6 @@ var bot = new Bot({
 						rollCallback.message = message;
 						rollCallback.key = key;
 						Roll.findOne({"id": message.from.id , "name" : key},rollCallback);
-					// 	if(user.rolls.hasOwnProperty(key))
-					// 	{
-					// 		roll = user.rolls[key];
-					// 		result = calculateRoll(roll);
-					// 		bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : message.from.username + " | " + key + " | " + result },function(nodifiedPromise){});
-					// 	// bot.sendMessage({"chat_id" : message.chat.id ,"text" : },function(nodifiedPromise){});
-						
-					// } else {
-					// 	bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "Roll name not found. Please save this roll first by \"/save <rollName> <integer>d<integer>{+,-}<integer>\", for example: \"/save magicmissile 1d4+1\""},function(nodifiedPromise){});
-					// }
 				}
 			};
 			userCallback.message = message;
@@ -300,6 +287,72 @@ var bot = new Bot({
 			saveCallback.key = key;
 			// saveCallback.rollString = splitStr[2];
 			User.findOne({"id": message.from.id}, saveCallback);
+
+			}
+			else if(splitStr[0] === "/roll")
+			{	
+				var nTimes = parseInt(splitStr[0]);
+				if( nTimes > 0)
+				{
+					if(nTimes > 100)
+					{
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : "I can repeat the roll to a maximum of 100 times at a time. Please try a smaller number."},function(nodifiedPromise){});
+						return
+					}
+					var key = splitStr[1];	
+					var userCallback = function(err,user){
+						if(err) 
+						{
+							console.log(err);
+							bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
+							return
+						}
+						if(user === null)
+						{
+							bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
+						} else 
+						{
+							//found user, now find roll if exists
+							var rollCallback = function(err,roll){
+								if(err) 
+								{
+									console.log(err);
+									bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
+									return
+								}
+								if(roll === null)
+								{
+									bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "Unsaved custom roll. Please save first with \"/save <roll name> <integer>d<integer>{+,-}<integer>\", for example: \"/save magicmissile 1d4+1\""},function(nodifiedPromise){});
+								} else 
+								{
+									var newRoll = {};
+									newRoll.times = roll.times;
+									newRoll.dice = roll.dice;
+									newRoll.modifier = roll.modifier;
+									var msgText = 'Rolling ' + key + ' ' + nTimes + ' for ' + message.from.username + '\n';
+									var sum = 0;
+									for (var i = 0; i < nTimes; i++) {
+										var rollResult = calculateRoll(newRoll);
+										msgText += rollResult + " | ";
+										sum += rollResult;
+									};
+									msgText += '\n' + 'Sum of rolls: ' + sum;
+									bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText},function(nodifiedPromise){});
+								}
+							};
+							rollCallback.message = message;
+							rollCallback.key = key;
+							Roll.findOne({"id": message.from.id , "name" : key},rollCallback);
+						}
+					};
+					userCallback.message = message;
+					userCallback.key = key;
+					User.findOne({"id": message.from.id}, userCallback);
+				}
+				else
+				{
+					//TODO: wrong roll ntimes syntax
+				}
 
 			}
 			// else
