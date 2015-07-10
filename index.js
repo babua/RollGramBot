@@ -159,9 +159,9 @@ var bot = new Bot({
 								});
 								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText },function(nodifiedPromise){});
 							}
-							rollCallback.message = message;
-							Roll.find({"id": message.from.id},rollCallback);
 						}
+						rollCallback.message = message;
+						Roll.find({"id": message.from.id},rollCallback);
 					}
 				}
 				userCallback.message = message;
