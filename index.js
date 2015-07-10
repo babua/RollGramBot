@@ -466,9 +466,8 @@ var bot = new Bot({
 			}
 			else if(splitStr[0] === "/wod")
 			{
-				var key = splitStr[1];
-				var times = parseInt(splitStr[2]);
-				var difficulty = parseInt(splitStr[3]);
+				var times = parseInt(splitStr[1]);
+				var difficulty = parseInt(splitStr[2]);
 
 				if(times > 0 && times <= 100 && difficulty > 0 && difficulty <= 10)
 				{
