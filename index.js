@@ -147,8 +147,10 @@ var bot = new Bot({
 							if(rolls === null)
 							{
 								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "No saved rolls found. Please save a roll first with \"/save <roll name> <integer>d<integer>{+,-}<integer>\", for example: \"/save magicmissile 1d4+1\""},function(nodifiedPromise){});
-							} else 
+							} 
+							else 
 							{
+								console.log('found rolls');
 								var msgText = 'Saved rolls for ' + message.from.username + '\n';
 								rolls.forEach(function(val,ind,arr){
 									var modifierSign = '+';
