@@ -233,65 +233,65 @@ var bot = new Bot({
 		{
 			if(splitStr[0] === "/save")
 			{
-			var key = splitStr[1];
-			var roll = parseRollString(splitStr[2]);
+				var key = splitStr[1];
+				var roll = parseRollString(splitStr[2]);
 
-			if(roll === false)
-			{
-				bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "Invalid save format. The expected format is \"/save <roll name> <integer>d<integer>{+,-}<integer>\", for example: \"/save magicmissile 1d4+1\""},function(nodifiedPromise){});
-				return
-			}
-
-			var saveCallback = function(err,user){
-				// var User = db.model('User');
-				if(err) 
+				if(roll === false)
 				{
-					console.log(err);
-					bot.sendMessage({"chat_id" : message.chat.id , "text" : "Unknown error" },function(nodifiedPromise){});
+					bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "Invalid save format. The expected format is \"/save <roll name> <integer>d<integer>{+,-}<integer>\", for example: \"/save magicmissile 1d4+1\""},function(nodifiedPromise){});
 					return
 				}
-				if(user === null)
-				{
-					bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
-				}
-				else 
-				{
-					if(roll === false)
+
+				var saveCallback = function(err,user){
+					// var User = db.model('User');
+					if(err) 
 					{
-						bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "Invalid roll format. The expected format is \"<integer>d<integer>{+,-}<integer>\", for example: \"2d12+4\""},function(nodifiedPromise){});
-					} 
-					else
-					{	
-						// user = user.toObject();
-						// console.log(typeof(user.rolls));
-						// console.log('user before adding roll');
-						// console.log(user);
-						// user.rolls[key.toString()] = roll;
-						// console.log('user after adding roll');
-						// console.log(user);
-
-						// var rollArray = new Array();
-						// rollArray[key] = roll;
-						// console.log(rollArray);
-
-						Roll.update({"id": user.id, "name": key}, {$set: {"dice": roll.dice, "times": roll.times, "modifier": roll.modifier}}, {"upsert": true, "new": true}, function(err,result){
-							console.log(result);
-							console.log('recorded roll');
-							bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : message.from.username + " | " + key + " | saved"},function(nodifiedPromise){});							
-						});
+						console.log(err);
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : "Unknown error" },function(nodifiedPromise){});
+						return
 					}
-				}
-			};
-			saveCallback.message = message;
-			saveCallback.roll = roll;
-			saveCallback.key = key;
-			// saveCallback.rollString = splitStr[2];
-			User.findOne({"id": message.from.id}, saveCallback);
+					if(user === null)
+					{
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
+					}
+					else 
+					{
+						if(roll === false)
+						{
+							bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "Invalid roll format. The expected format is \"<integer>d<integer>{+,-}<integer>\", for example: \"2d12+4\""},function(nodifiedPromise){});
+						} 
+						else
+						{	
+							// user = user.toObject();
+							// console.log(typeof(user.rolls));
+							// console.log('user before adding roll');
+							// console.log(user);
+							// user.rolls[key.toString()] = roll;
+							// console.log('user after adding roll');
+							// console.log(user);
 
+							// var rollArray = new Array();
+							// rollArray[key] = roll;
+							// console.log(rollArray);
+
+							Roll.update({"id": user.id, "name": key}, {$set: {"dice": roll.dice, "times": roll.times, "modifier": roll.modifier}}, {"upsert": true, "new": true}, function(err,result){
+								console.log(result);
+								console.log('recorded roll');
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : message.from.username + " | " + key + " | saved"},function(nodifiedPromise){});							
+							});
+						}
+					}
+				};
+				saveCallback.message = message;
+				saveCallback.roll = roll;
+				saveCallback.key = key;
+				// saveCallback.rollString = splitStr[2];
+				User.findOne({"id": message.from.id}, saveCallback);
 			}
 			else if(splitStr[0] === "/roll")
 			{	
 				console.log('rolling n times');
+				var key = splitStr[1];
 				var nTimes = parseInt(splitStr[0]);
 				if( nTimes > 0)
 				{
