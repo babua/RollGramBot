@@ -78,6 +78,7 @@ var bot = new Bot({
 	console.log(message);
 	var User = db.model('User');
 	var Roll = db.model('Roll');
+	var WodRoll = db.model('WodRoll');
 
 	if(message.hasOwnProperty("text"))
 	{
@@ -87,7 +88,6 @@ var bot = new Bot({
 		{
 			if(splitStr[0] === "/register")
 			{
-				console.log("entered /register")
 				var userRegisterCallback = function(err,user){
 					// var User = db.model('User');
 					if(err) 
@@ -105,7 +105,6 @@ var bot = new Bot({
 							bot.sendMessage({"chat_id" : message.chat.id , "text" : err},function(nodifiedPromise){});
 							return
 						});
-						console.log('added new user');
 						bot.sendMessage({"chat_id" : message.chat.id , "text" : "User " + message.from.username + " is registered"},function(nodifiedPromise){});
 					} else {
 						bot.sendMessage({"chat_id" : message.chat.id , "text" : "User " + message.from.username + " was already registered"},function(nodifiedPromise){});
@@ -262,18 +261,6 @@ var bot = new Bot({
 						} 
 						else
 						{	
-							// user = user.toObject();
-							// console.log(typeof(user.rolls));
-							// console.log('user before adding roll');
-							// console.log(user);
-							// user.rolls[key.toString()] = roll;
-							// console.log('user after adding roll');
-							// console.log(user);
-
-							// var rollArray = new Array();
-							// rollArray[key] = roll;
-							// console.log(rollArray);
-
 							Roll.update({"id": user.id, "name": key}, {$set: {"dice": roll.dice, "times": roll.times, "modifier": roll.modifier}}, {"upsert": true, "new": true}, function(err,result){
 								console.log(result);
 								console.log('recorded roll');
@@ -362,6 +349,48 @@ var bot = new Bot({
 			// {
 			// 	bot.sendMessage({"chat_id" : message.chat.id , "text" : "Unknown request. Try /help for options"});
 			// }
+		}
+		else if (splitStr.length === 4)
+		{
+			if(splitStr[0] === "/wodsave")
+			{
+				var key = splitStr[1];
+				var times = parseInt(splitStr[2]);
+				var difficulty = parseInt(splitStr[3]);
+
+				if(key !== null && key !== undefined && times > 0 && times <= 100 && difficulty > 0 && difficulty <= 10)
+				{
+					var saveCallback = function(err,user){
+						// var User = db.model('User');
+						if(err) 
+						{
+							console.log(err);
+							bot.sendMessage({"chat_id" : message.chat.id , "text" : "Unknown error" },function(nodifiedPromise){});
+							return
+						}
+						if(user === null)
+						{
+							bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
+						}
+						else 
+						{
+							WodRoll.update({"id": user.id, "name": key}, {$set: {"times": times, "difficulty": difficulty}}, {"upsert": true, "new": true}, function(err,result){
+								console.log(result);
+								console.log('recorded wod roll');
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : message.from.username + " | " + key + " | saved"},function(nodifiedPromise){});							
+							});
+						}
+					};
+					saveCallback.message = message;
+					saveCallback.times = times;
+					saveCallback.difficulty = difficulty;
+					saveCallback.key = key;
+					User.findOne({"id": message.from.id}, saveCallback);
+				} else
+				{
+					//TODO: error
+				}
+			}
 		}
 	}
 }).start();
