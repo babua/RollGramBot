@@ -190,6 +190,51 @@ var bot = new Bot({
 				userCallback.message = message;
 				User.findOne({"id": message.from.id}, userCallback);
 			}
+			else if (splitStr[0] === "/wodshow")
+			{
+				var userCallback = function(err,user)
+				{
+					if(err) 
+					{
+						console.log(err);
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
+						return
+					}
+					if(user === null)
+					{
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
+					} else 
+					{
+					//found user, now display rolls
+						var rollCallback = function(err,rolls)
+						{
+							if(err) 
+							{
+								console.log(err);
+								bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
+								return
+							}
+							if(rolls === null)
+							{
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "No saved rolls found. Please save a roll first with \"/save <roll name> <integer>d<integer>{+,-}<integer>\", for example: \"/save magicmissile 1d4+1\""},function(nodifiedPromise){});
+							} 
+							else 
+							{
+								console.log('found rolls');
+								var msgText = 'Saved WoD rolls for ' + message.from.username + '\n';
+								rolls.forEach(function(val,ind,arr){
+									msgText += val.name + " | Dice Pool: " + val.times + " | Difficulty: " + val.difficulty +'\n';
+								});
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText },function(nodifiedPromise){});
+							}
+						}
+						rollCallback.message = message;
+						WodRoll.find({"id": message.from.id},rollCallback);
+					}
+				}
+				userCallback.message = message;
+				User.findOne({"id": message.from.id}, userCallback);
+			}
 		}
 		else if (splitStr.length === 2)
 		{ 
@@ -276,8 +321,9 @@ var bot = new Bot({
 							}
 							if(wodroll === null)
 							{
-								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "Unsaved custom roll. Please save first with \"/wodsave <roll name> <dice amount> <difficulty>\", for example: \"/save attack 6 5\""},function(nodifiedPromise){});
-							} else 
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "Unsaved custom roll. Please save first with \"/wodsave <roll name> <dice pool> <difficulty>\", for example: \"/save attack 6 5\""},function(nodifiedPromise){});
+							} 
+							else 
 							{
 								result = calculateWodRoll(wodroll.times,wodroll.difficulty);
 								console.log(result);
@@ -417,7 +463,27 @@ var bot = new Bot({
 					var msgText = "Invalid command for repeating saved roll. Try \"/roll <rollname> <integer>\" with <integer> smaller than 100 and a previously saved roll name. For example: \"/roll magicmissile 5\"";
 					bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText},function(nodifiedPromise){});
 				}
+			}
+			else if(splitStr[0] === "/wod")
+			{
+				var key = splitStr[1];
+				var times = parseInt(splitStr[2]);
+				var difficulty = parseInt(splitStr[3]);
 
+				if(key !== null && key !== undefined && times > 0 && times <= 100 && difficulty > 0 && difficulty <= 10)
+				{
+					result = calculateWodRoll(wodroll.times,wodroll.difficulty);
+					console.log(result);
+					var msgText = message.from.username + " | " + key + " | " + (result.success-result.failure) + '\n';
+					console.log(msgText);
+					msgText += 'Success: ' + result.success + ' | Dramatic Failure: ' + result.failure;
+					bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" :msgText },function(nodifiedPromise){});
+				} 
+				else
+				{
+					var msgText = 'Invalid WoD quick roll format. Correct format is \"/wod <dice pool> <difficulty>\", for example, \"/wod 6 5\"';
+					bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" :msgText },function(nodifiedPromise){});
+				}
 			}
 			// else
 			// {
@@ -462,7 +528,8 @@ var bot = new Bot({
 					User.findOne({"id": message.from.id}, saveCallback);
 				} else
 				{
-					//TODO: error
+					var msgText = 'Invalid WoD roll format. Correct format is \"/wodsave <roll name> <dice pool> <difficulty>\", for example, \"/wodsave attack 6 5\"';
+					bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" :msgText },function(nodifiedPromise){});
 				}
 			}
 		}
