@@ -141,7 +141,8 @@ var bot = new Bot({
 			}
 			else if (splitStr[0] === "/help")
 			{
-				bot.sendMessage({"chat_id" : message.chat.id , "text" : "/register - register to start using the bot and save your custom rolls | usage: \"/register\"\n/qroll - quick roll without saving a custom roll | usage: \"/qroll 1d4+1\"\n/save - save a custom roll | usage \"/save magicmissile 1d4+1\"\n/roll - roll a previously saved custom roll | usage: \"/roll magicmissile\""});
+				var msgText = "/help - show this message\n/register - register to start using the bot and save your custom rolls\n↳usage: \"/register\"\n\n===== d20 Rolls =====\n\n/qroll - quick roll without saving a custom roll\n↳usage: \"/qroll 1d4+1\"\n\n/save - save a custom roll\n↳usage \"/save magicmissile 1d4+1\"\n\n/roll - roll a previously saved custom roll, optionally repeat\n↳usage: \"/roll magicmissile\"\n↳usage: \"/roll magicmissile 5\"\n\n/show - show saved rolls\n↳usage: \"/show\"\n\n===== World of Darkness Rolls =====\n\n/wodsave - save a custom roll, with dice pool and difficulty, in that order\n↳usage: \"/wodsave attack 6 5\"\n\n/wod - roll a previously saved custom roll or an unsaved roll\n↳usage: \"/wod attack\"\n↳usage: \"/wod 6 5\"\n\n/wodshow - show saved rolls\n↳usage: \"/wodshow\"";
+				bot.sendMessage({"chat_id" : message.chat.id , "text" : msgText});
 			}
 			else if (splitStr[0] === "/show")
 			{
