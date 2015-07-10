@@ -117,7 +117,53 @@ var bot = new Bot({
 			else if (splitStr[0] === "/help")
 			{
 				bot.sendMessage({"chat_id" : message.chat.id , "text" : "/register - register to start using the bot and save your custom rolls | usage: \"/register\"\n/qroll - quick roll without saving a custom roll | usage: \"/qroll 1d4+1\"\n/save - save a custom roll | usage \"/save magicmissile 1d4+1\"\n/roll - roll a previously saved custom roll | usage: \"/roll magicmissile\""});
-			}			
+			}
+			else if (splitStr[0] === "/show")
+			{
+				var userCallback = function(err,user)
+				{
+					if(err) 
+					{
+						console.log(err);
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
+						return
+					}
+					if(user === null)
+					{
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
+					} else 
+					{
+					//found user, now display rolls
+						var rollCallback = function(err,rolls)
+						{
+							if(err) 
+							{
+								console.log(err);
+								bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
+								return
+							}
+							if(roll === null)
+							{
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "No saved rolls found. Please save a roll first with \"/save <roll name> <integer>d<integer>{+,-}<integer>\", for example: \"/save magicmissile 1d4+1\""},function(nodifiedPromise){});
+							} else 
+							{
+								var msgText = 'Saved rolls for ' + message.from.username + '\n';
+								rolls.forEach(function(val,ind,arr){
+									var modifierSign = '+';
+									if(val.modifier < 0) modifierSign = '';
+									msgText += val.name + " | " + val.times + "d" + val.dice +  modifierSign + val.modifier + '\n';
+								});
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText },function(nodifiedPromise){});
+							}
+							rollCallback.message = message;
+							Roll.find({"id": message.from.id},rollCallback);
+						}
+					}
+				}
+				userCallback.message = message;
+				User.findOne({"id": message.from.id}, userCallback);
+			}
+
 		}
 		else if (splitStr.length === 2)
 		{ 
