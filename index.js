@@ -280,8 +280,10 @@ var bot = new Bot({
 							} else 
 							{
 								result = calculateWodRoll(wodroll.times,wodroll.difficulty);
-								var msgText = message.from.username + " | " + key + " | " + result.success-result.failure + '\n';
-								msgText += 'Raw results | Success: ' + result.success + ' | Dramatic Failure: ' + result.failure;
+								console.log(result);
+								var msgText = message.from.username + " | " + key + " | " + (result.success-result.failure) + '\n';
+								console.log(msgText);
+								msgText += 'Success: ' + result.success + ' | Dramatic Failure: ' + result.failure;
 								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" :msgText },function(nodifiedPromise){});
 							}
 
