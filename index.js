@@ -470,7 +470,7 @@ var bot = new Bot({
 				var times = parseInt(splitStr[2]);
 				var difficulty = parseInt(splitStr[3]);
 
-				if(key !== null && key !== undefined && times > 0 && times <= 100 && difficulty > 0 && difficulty <= 10)
+				if(times > 0 && times <= 100 && difficulty > 0 && difficulty <= 10)
 				{
 					result = calculateWodRoll(wodroll.times,wodroll.difficulty);
 					console.log(result);
