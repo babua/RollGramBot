@@ -120,6 +120,7 @@ var bot = new Bot({
 			}
 			else if (splitStr[0] === "/show")
 			{
+				console.log("showing rolls");
 				var userCallback = function(err,user)
 				{
 					if(err) 
