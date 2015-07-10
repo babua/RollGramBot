@@ -134,6 +134,7 @@ var bot = new Bot({
 						bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
 					} else 
 					{
+						console.log('found user');
 					//found user, now display rolls
 						var rollCallback = function(err,rolls)
 						{
@@ -143,7 +144,7 @@ var bot = new Bot({
 								bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
 								return
 							}
-							if(roll === null)
+							if(rolls === null)
 							{
 								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "No saved rolls found. Please save a roll first with \"/save <roll name> <integer>d<integer>{+,-}<integer>\", for example: \"/save magicmissile 1d4+1\""},function(nodifiedPromise){});
 							} else 
