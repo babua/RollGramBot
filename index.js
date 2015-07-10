@@ -294,6 +294,7 @@ var bot = new Bot({
 				var nTimes = parseInt(splitStr[0]);
 				if( nTimes > 0)
 				{
+					console.log('rolling ' + key + ' ' + nTimes);
 					if(nTimes > 100)
 					{
 						bot.sendMessage({"chat_id" : message.chat.id , "text" : "I can repeat the roll to a maximum of 100 times at a time. Please try a smaller number."},function(nodifiedPromise){});
