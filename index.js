@@ -344,7 +344,7 @@ var bot = new Bot({
 				userCallback.key = key;
 				User.findOne({"id": message.from.id}, userCallback);
 			}
-			if(splitStr[0] === "/delete")
+			else if(splitStr[0] === "/delete")
 			{
 				var key = splitStr[1];	
 				var userCallback = function(err,user){
@@ -381,6 +381,49 @@ var bot = new Bot({
 						deleteCallback.message = message;
 						deleteCallback.key = key;
 						Roll.findOne({"id": message.from.id , "name" : key}).remove(deleteCallback);
+					}
+				};
+				userCallback.message = message;
+				userCallback.key = key;
+				User.findOne({"id": message.from.id}, userCallback);
+			}
+			else if(splitStr[0] === "/deletewod")
+			{
+				var key = splitStr[1];	
+				var userCallback = function(err,user){
+					if(err) 
+					{
+						console.log(err);
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
+						return
+					}
+					if(user === null)
+					{
+						bot.sendMessage({"chat_id" : message.chat.id , "text" : "Please register first by typing \"/register\" (without the quotes)"});
+					} 
+					else 
+					{
+						//found user, now find roll if exists
+						var deleteCallback = function(err,roll){
+							if(err) 
+							{
+								console.log(err);
+								bot.sendMessage({"chat_id" : message.chat.id , "text" : err.toString()},function(nodifiedPromise){});
+								return
+							}
+							if(roll === null)
+							{
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : "Unsaved custom roll. Please save first with \"/save <roll name> <integer>d<integer>{+,-}<integer>\", for example: \"/save magicmissile 1d4+1\""},function(nodifiedPromise){});
+							} else 
+							{
+								var msgText = key + " removed for " + message.from.username;
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText},function(nodifiedPromise){});
+							}
+
+						}
+						deleteCallback.message = message;
+						deleteCallback.key = key;
+						WodRoll.findOne({"id": message.from.id , "name" : key}).remove(deleteCallback);
 					}
 				};
 				userCallback.message = message;
