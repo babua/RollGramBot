@@ -63,7 +63,7 @@ var parseRollString = function(rollStr){
 
 
 var calculateRoll = function(roll){
-	var result;
+	var result = {};
 	result.rolls = [];
 	var sum = 0;
 	for (var i = 0; i < roll.times; i++) {
