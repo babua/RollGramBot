@@ -63,12 +63,17 @@ var parseRollString = function(rollStr){
 
 
 var calculateRoll = function(roll){
+	var result;
+	result.rolls = [];
 	var sum = 0;
 	for (var i = 0; i < roll.times; i++) {
-		sum += Math.floor(Math.random() * roll.dice) + 1;
+		rolled = Math.floor(Math.random() * roll.dice) + 1;
+		sum += rolled;
+		result.rolls.push(rolled);
 	};
 	sum += roll.modifier;
-	return sum;
+	result.sum = sum;
+	return result;
 }
 
 var calculateWodRoll = function(times,difficulty){
@@ -273,7 +278,13 @@ var bot = new Bot({
 								newRoll.dice = roll.dice;
 								newRoll.modifier = roll.modifier;
 								result = calculateRoll(newRoll);
-								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : message.from.username + " | " + key + " | " + result },function(nodifiedPromise){});
+								var msgText = message.from.username + " | " + key + " | " + result.sum;
+								msgText += '\n' + 'Rolled values: ';
+								for (var i = 0; i < result.rolls.length; i++) {
+									msgText += result.rolls[i] + ', ';
+								};
+
+								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText },function(nodifiedPromise){});
 							}
 
 						}
@@ -294,7 +305,12 @@ var bot = new Bot({
 					return
 				}
 				var result = calculateRoll(roll);
-				bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : message.from.username + " | " + splitStr[1] + " | " + result },function(nodifiedPromise){});
+				var msgText = message.from.username + " | " + splitStr[1] + " | " + result.sum;
+				msgText += '\n' + 'Rolled values: ';
+				for (var i = 0; i < result.rolls.length; i++) {
+					msgText += result.rolls[i] + ', ';
+				};
+				bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText },function(nodifiedPromise){});
 			}
 			else if(splitStr[0] === "/wod")
 			{
@@ -525,8 +541,8 @@ var bot = new Bot({
 									var sum = 0;
 									for (var i = 0; i < nTimes; i++) {
 										var rollResult = calculateRoll(newRoll);
-										msgText += rollResult + " | ";
-										sum += rollResult;
+										msgText += rollResult.sum + " | ";
+										sum += rollResult.sum;
 									};
 									msgText += '\n' + 'Sum of rolls: ' + sum;
 									bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText},function(nodifiedPromise){});
