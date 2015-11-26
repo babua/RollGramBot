@@ -281,7 +281,10 @@ var bot = new Bot({
 								var msgText = message.from.username + " | " + key + " | " + result.sum;
 								msgText += '\n' + 'Rolled values: ';
 								for (var i = 0; i < result.rolls.length; i++) {
-									msgText += result.rolls[i] + ', ';
+									msgText += result.rolls[i];
+									if(i < result.rolls.length-1){
+										msgText += ', ';
+									}
 								};
 
 								bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText },function(nodifiedPromise){});
@@ -308,7 +311,10 @@ var bot = new Bot({
 				var msgText = message.from.username + " | " + splitStr[1] + " | " + result.sum;
 				msgText += '\n' + 'Rolled values: ';
 				for (var i = 0; i < result.rolls.length; i++) {
-					msgText += result.rolls[i] + ', ';
+					msgText += result.rolls[i];
+					if(i < result.rolls.length-1){
+						msgText += ', ';
+					}
 				};
 				bot.sendMessage({"chat_id" : message.chat.id , "reply_to_message_id" : message.message_id ,"text" : msgText },function(nodifiedPromise){});
 			}
