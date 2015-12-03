@@ -5,10 +5,17 @@ var db = mongoose();
 
 var parseRollString = function(rollStr){
 	console.log(rollStr);
+	var dString = 'd';
 	if(rollStr.indexOf('d') === -1){
-		return false;
+		if(rollStr.indexOf('D') === -1){
+			return false;
+		}
+		else {
+			dString = 'D';
+		}
+		
 	}
-	var splitStr = rollStr.split('d');
+	var splitStr = rollStr.split(dString);
 	// console.log(splitStr);
 	var firstPart = splitStr[0];
 	var secondPart = rollStr.substring(firstPart.length + 1);
